@@ -61,7 +61,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>
-                                ${project.basedir}\src\main\resource\swagger\petstore.yaml
+                                ${project.basedir}/src/main/resources/swagger/petstore.yaml
                             </inputSpec>
                             <library>feign</library>
                             <modelPackage>petstore.model</modelPackage>
