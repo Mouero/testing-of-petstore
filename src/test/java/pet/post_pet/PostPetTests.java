@@ -34,19 +34,25 @@ public class PostPetTests {
 
     @SneakyThrows
     @BeforeMethod(alwaysRun = true)
-    public void beforeMethod() {
+    public void beforeTest() {
         baseUri =
-                step("Создание базового URI", () ->
+                step("Создание базового URL", () ->
                         URL + PORT + BASE_PATH);
         uriPost =
                 step("Создание URI для запроса Post/pet", () ->
                         baseUri + "/pet");
-
         headers = new HttpHeaders();
         step("Создание хедеров", () -> {
             headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
         });
+
+    }
+
+    @Story("POST /pet")
+    @Test(description = "Метод POST /pet должен вернуть модель Pet ")
+    public void postPetShouldReturnPetTest() {
 
         petRequest = new Pet();
         step("Заполнение модели Pet данными", () ->
@@ -57,6 +63,7 @@ public class PostPetTests {
                         .photoUrls(List.of("url1", "url2"))
                         .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
                         .status(Pet.StatusEnum.SOLD));
+
         jsonRequestBody =
                 step("Модель Pet в json", () ->
                         new ObjectMapper()
@@ -64,12 +71,6 @@ public class PostPetTests {
                                 .withDefaultPrettyPrinter()
                                 .writeValueAsString(petRequest));
 
-
-    }
-
-    @Story("POST/pet")
-    @Test
-    public void postPetShouldReturnPetTest() {
         uriGet =
                 step("Создание URI для запроса Get/pet/{petId}", () ->
                         baseUri + "/pet/15");
@@ -78,7 +79,6 @@ public class PostPetTests {
         Pet getPetByPetId =
                 step("Вызов запроса Get /pet/{petId} для получения созданного питомца", ()->
                         restTemplate.exchange(uriGet,HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody());
-
 
         SoftAssert softAssert = new SoftAssert();
         step("Сравнение ожидаемого и фактического результата", () -> {
@@ -110,26 +110,16 @@ public class PostPetTests {
 
     }
 
-    @Story("POST/pet")
-    @Test
-    public void getPetByPetIdNegativeTest() {
-
-        uriGet =
-                step("Создание URI для запроса Get/pet/{petId}", () ->
-                        baseUri + "/pet/16");
-
-        step("Вызов Post запроса", () ->
-                restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
-
-        HttpClientErrorException getPetByPetId =
-                step("Вызов запроса GET /pet/{petId} для получения созданного питомца", () ->
+    @Story("POST /pet")
+    @Test(description = "Метод POST /pet должен вернуть bad request")
+    public void postPetShouldReturnBadRequestTest() {
+        HttpClientErrorException postPet =
+                step("Вызов запроса POST /pet для создания питомца", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
-                                () -> restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class))
+                                () -> restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class))
                 );
-        Assert.assertEquals(getPetByPetId.getStatusCode(), HttpStatus.NOT_FOUND);
-
-
+        Assert.assertEquals(postPet.getStatusCode(), HttpStatus.BAD_REQUEST);
 
     }
 
