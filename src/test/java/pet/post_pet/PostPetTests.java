@@ -2,6 +2,7 @@ package pet.post_pet;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import lombok.SneakyThrows;
 import org.springframework.http.*;
@@ -18,7 +19,7 @@ import petstore.model.Tag;
 import java.util.List;
 
 import static io.qameta.allure.Allure.step;
-
+@Feature("Pet")
 public class PostPetTests {
     private static final String URL = "http://localhost:";
     private static final int PORT = 8080;
@@ -52,7 +53,7 @@ public class PostPetTests {
 
     @Story("POST /pet")
     @Test(description = "Метод POST /pet должен вернуть модель Pet ")
-    public void postPetShouldReturnPetTest() {
+    public void postPetShouldReturnStatusCodeOkTest() {
 
         petRequest = new Pet();
         step("Заполнение модели Pet данными", () ->
@@ -72,7 +73,7 @@ public class PostPetTests {
                                 .writeValueAsString(petRequest));
 
         uriGet =
-                step("Создание URI для запроса Get/pet/{petId}", () ->
+                step("Создание URI для запроса Get /pet/{petId}", () ->
                         baseUri + "/pet/15");
         step("Вызов Post запроса", () ->
                 restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
@@ -113,13 +114,14 @@ public class PostPetTests {
     @Story("POST /pet")
     @Test(description = "Метод POST /pet должен вернуть bad request")
     public void postPetShouldReturnBadRequestTest() {
-        HttpClientErrorException postPet =
-                step("Вызов запроса POST /pet для создания питомца", () ->
+        HttpClientErrorException exceptionPostPet =
+                step("Вызов запроса POST /pet без тела запроса", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class))
                 );
-        Assert.assertEquals(postPet.getStatusCode(), HttpStatus.BAD_REQUEST);
+        step("Сравнение фактического и ожидаемого статус кода Post /pet запроса",()->
+                Assert.assertEquals(exceptionPostPet.getStatusCode(), HttpStatus.BAD_REQUEST));
 
     }
 
