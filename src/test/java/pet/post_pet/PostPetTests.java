@@ -114,14 +114,14 @@ public class PostPetTests {
     @Story("POST /pet")
     @Test(description = "Метод POST /pet должен вернуть bad request")
     public void postPetShouldReturnBadRequestTest() {
-        HttpClientErrorException exceptionPostPet =
+        HttpClientErrorException exception =
                 step("Вызов запроса POST /pet без тела запроса", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class))
                 );
         step("Сравнение фактического и ожидаемого статус кода Post /pet запроса",()->
-                Assert.assertEquals(exceptionPostPet.getStatusCode(), HttpStatus.BAD_REQUEST));
+                Assert.assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST));
 
     }
 
