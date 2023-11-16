@@ -30,11 +30,11 @@ public class PutPetTests {
     private String uriPut;
     private String uriPost;
     private String uriGet;
-    private String postJsonRequestBody;
     private String putJsonRequestBody;
+    private String postJsonRequestBody;
     private HttpHeaders headers = new HttpHeaders();
-    private Pet postPetRequest;
     private Pet putPetRequest;
+    private Pet postPetRequest;
 
     @SneakyThrows
     @BeforeMethod(alwaysRun = true)
@@ -43,38 +43,40 @@ public class PutPetTests {
                 step("Создание базового URL", () ->
                         URL + PORT + BASE_PATH);
         uriPost =
-                step("Создание URI для запроса Post /pet", () ->
+                step("Создание URI для запроса POST /pet", () ->
                         baseUri + "/pet");
         uriPut =
-                step("Создание URI для запроса Put /pet", () ->
+                step("Создание URI для запроса PUT /pet", () ->
                         baseUri + "/pet");
         uriGet =
-                step("Создание URI для запроса Get /pet/{petId}", () ->
+                step("Создание URI для запроса GET /pet/{petId}", () ->
                         baseUri + "/pet/" + ID);
 
         headers = new HttpHeaders();
         step("Создание хедеров", () -> {
             headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);});
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        });
 
-            postPetRequest = new Pet();
-            step("Заполнение модели Pet данными", () ->
-                    postPetRequest
-                            .id(ID)
-                            .name("Volt")
-                            .category(new Category().id(1L).name("Dogs"))
-                            .photoUrls(List.of("url1", "url2"))
-                            .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
-                            .status(Pet.StatusEnum.SOLD));
+        postPetRequest = new Pet();
+        step("Заполнение модели Pet данными", () ->
+                postPetRequest
+                        .id(ID)
+                        .name("Volt")
+                        .category(new Category().id(1L).name("Dogs"))
+                        .photoUrls(List.of("url1", "url2"))
+                        .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
+                        .status(Pet.StatusEnum.SOLD));
 
-            postJsonRequestBody =
-                    step("Модель Pet в json", () ->
-                            new ObjectMapper()
-                                    .writer()
-                                    .withDefaultPrettyPrinter()
-                                    .writeValueAsString(postPetRequest));
-            step("Вызов Post запроса", () ->
-                    restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(postJsonRequestBody, headers), String.class));
+        postJsonRequestBody =
+                step("Модель Pet в json", () ->
+                        new ObjectMapper()
+                                .writer()
+                                .withDefaultPrettyPrinter()
+                                .writeValueAsString(postPetRequest));
+
+        step("Вызов POST /pet запроса для создания питомца", () ->
+                restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(postJsonRequestBody, headers), String.class));
     }
 
     @Story("PUT /pet")
@@ -82,13 +84,14 @@ public class PutPetTests {
     public void putPetShouldReturnStatusCodeOkTest() {
 
         putPetRequest = new Pet();
-        putPetRequest
-                .id(ID)
-                .name("Voltik")
-                .category(new Category().id(1L).name("Dogiis"))
-                .photoUrls(List.of("url1", "url2"))
-                .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
-                .status(Pet.StatusEnum.SOLD);
+        step("Изменение данных в модели Pet", () ->
+                putPetRequest
+                        .id(ID)
+                        .name("Voltik")
+                        .category(new Category().id(1L).name("Dogiis"))
+                        .photoUrls(List.of("url1", "url2"))
+                        .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
+                        .status(Pet.StatusEnum.SOLD));
 
         putJsonRequestBody =
                 step("Модель Pet в json", () ->
@@ -97,11 +100,11 @@ public class PutPetTests {
                                 .withDefaultPrettyPrinter()
                                 .writeValueAsString(putPetRequest));
 
-        step("Вызов Put запроса", () ->
+        step("Вызов PUT /pet запроса для внесения изменений в созданного питомца", () ->
                 restTemplate.exchange(uriPut, HttpMethod.PUT, new HttpEntity<>(putJsonRequestBody, headers), String.class));
 
         Pet getPetByPetId =
-                step("Вызов запроса Get /pet/{petId} для получения изменённого питомца", () ->
+                step("Вызов запроса GET /pet/{petId} для получения изменённого питомца", () ->
                         restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody());
 
         SoftAssert softAssert = new SoftAssert();
@@ -129,21 +132,23 @@ public class PutPetTests {
             step("Сравнение по status", () ->
                     softAssert.assertEquals(getPetByPetId.getStatus(), putPetRequest.getStatus(),
                             "Поле status не совпадает"));
+            softAssert.assertAll();
         });
     }
 
     @Story("PUT /pet")
     @Test(description = "Метод PUT /pet должен вернуть статус код Not Found")
     public void putPetShouldReturnStatusCodeNotFoundTest() {
-        putPetRequest = new Pet();
-        putPetRequest
-                .id(16L)
-                .name("Voltik")
-                .category(new Category().id(1L).name("Dogiis"))
-                .photoUrls(List.of("url1", "url2"))
-                .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
-                .status(Pet.StatusEnum.SOLD);
 
+        putPetRequest = new Pet();
+        step("Изменение данных в модели Pet", () ->
+                putPetRequest
+                        .id(16L)
+                        .name("Voltik")
+                        .category(new Category().id(1L).name("Dogiis"))
+                        .photoUrls(List.of("url1", "url2"))
+                        .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
+                        .status(Pet.StatusEnum.SOLD));
         putJsonRequestBody =
                 step("Модель Pet в json", () ->
                         new ObjectMapper()
@@ -158,57 +163,27 @@ public class PutPetTests {
                                 () -> restTemplate.exchange(uriPut, HttpMethod.PUT, new HttpEntity<>(putJsonRequestBody, headers), String.class))
                 );
 
-        step("Сравнение фактического и ожидаемого статус кода PUT /pet запроса",()->
+        step("Сравнение фактического и ожидаемого статус кода PUT /pet запроса", () ->
                 Assert.assertEquals(exception.getStatusCode(), HttpStatus.NOT_FOUND));
     }
 
     @Story("PUT /pet")
     @Test(description = "Метод PUT /pet должен вернуть статус код Bad Request")
     public void putPetShouldReturnStatusCodeBadRequestTest() {
-
-        putPetRequest = new Pet();
-        putPetRequest
-                .id(16L)
-                .name("Voltik")
-                .category(new Category().id(1L).name("Dogiis"))
-                .photoUrls(List.of("url1", "url2"))
-                .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
-                .status(Pet.StatusEnum.SOLD);
+        String putJsonRequestBodyBadRequest = new ObjectMapper().toString();
 
         uriPut =
-                step("Создание URI для запроса Put /pet", () ->
+                step("Создание URI для запроса PUT /pet", () ->
                         baseUri + "/pet");
 
         HttpClientErrorException exception =
                 step("Вызов запроса PUT /pet с другим id", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
-                                () -> restTemplate.exchange(uriPut, HttpMethod.PUT, new HttpEntity<>(putJsonRequestBody, headers), String.class))
+                                () -> restTemplate.exchange(uriPut, HttpMethod.PUT, new HttpEntity<>(putJsonRequestBodyBadRequest, headers), String.class))
                 );
 
-        step("Сравнение фактического и ожидаемого статус кода PUT /pet запроса",()->
+        step("Сравнение фактического и ожидаемого статус кода PUT /pet запроса", () ->
                 Assert.assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

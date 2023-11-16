@@ -19,6 +19,7 @@ import petstore.model.Tag;
 import java.util.List;
 
 import static io.qameta.allure.Allure.step;
+
 @Feature("Pet")
 public class PostPetTests {
     private static final String URL = "http://localhost:";
@@ -78,8 +79,8 @@ public class PostPetTests {
         step("Вызов Post запроса", () ->
                 restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
         Pet getPetByPetId =
-                step("Вызов запроса Get /pet/{petId} для получения созданного питомца", ()->
-                        restTemplate.exchange(uriGet,HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody());
+                step("Вызов запроса Get /pet/{petId} для получения созданного питомца", () ->
+                        restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody());
 
         SoftAssert softAssert = new SoftAssert();
         step("Сравнение ожидаемого и фактического результата", () -> {
@@ -92,21 +93,21 @@ public class PostPetTests {
                             "Поле name не совпадает"));
 
             step("Сравнение по category", () ->
-                    softAssert.assertEquals(getPetByPetId.getCategory(),petRequest.getCategory(),
+                    softAssert.assertEquals(getPetByPetId.getCategory(), petRequest.getCategory(),
                             "Поле category не совпадает"));
 
             step("Сравнение по photoUrls", () ->
-                    softAssert.assertEquals(getPetByPetId.getPhotoUrls(),petRequest.getPhotoUrls(),
+                    softAssert.assertEquals(getPetByPetId.getPhotoUrls(), petRequest.getPhotoUrls(),
                             "Поле category не совпадает"));
 
             step("Сравнение по tags", () ->
-                    softAssert.assertEquals(getPetByPetId.getTags(),petRequest.getTags(),
+                    softAssert.assertEquals(getPetByPetId.getTags(), petRequest.getTags(),
                             "Поле ctags не совпадает"));
 
             step("Сравнение по status", () ->
-                    softAssert.assertEquals(getPetByPetId.getStatus(),petRequest.getStatus(),
+                    softAssert.assertEquals(getPetByPetId.getStatus(), petRequest.getStatus(),
                             "Поле status не совпадает"));
-
+            softAssert.assertAll();
         });
 
     }
@@ -120,7 +121,7 @@ public class PostPetTests {
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class))
                 );
-        step("Сравнение фактического и ожидаемого статус кода Post /pet запроса",()->
+        step("Сравнение фактического и ожидаемого статус кода Post /pet запроса", () ->
                 Assert.assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST));
 
     }
