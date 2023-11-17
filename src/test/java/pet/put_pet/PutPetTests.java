@@ -30,11 +30,7 @@ public class PutPetTests {
     private String uriPut;
     private String uriPost;
     private String uriGet;
-    private String putJsonRequestBody;
-    private String postJsonRequestBody;
     private HttpHeaders headers = new HttpHeaders();
-    private Pet putPetRequest;
-    private Pet postPetRequest;
 
     @SneakyThrows
     @BeforeMethod(alwaysRun = true)
@@ -58,7 +54,7 @@ public class PutPetTests {
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         });
 
-        postPetRequest = new Pet();
+        Pet postPetRequest = new Pet();
         step("Заполнение модели Pet данными", () ->
                 postPetRequest
                         .id(ID)
@@ -68,7 +64,7 @@ public class PutPetTests {
                         .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
                         .status(Pet.StatusEnum.SOLD));
 
-        postJsonRequestBody =
+        String postJsonRequestBody =
                 step("Модель Pet в json", () ->
                         new ObjectMapper()
                                 .writer()
@@ -83,7 +79,7 @@ public class PutPetTests {
     @Test(description = "Метод PUT /pet должен вернуть статус код Ok")
     public void putPetShouldReturnStatusCodeOkTest() {
 
-        putPetRequest = new Pet();
+        Pet putPetRequest = new Pet();
         step("Изменение данных в модели Pet", () ->
                 putPetRequest
                         .id(ID)
@@ -93,7 +89,7 @@ public class PutPetTests {
                         .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
                         .status(Pet.StatusEnum.SOLD));
 
-        putJsonRequestBody =
+        String putJsonRequestBody =
                 step("Модель Pet в json", () ->
                         new ObjectMapper()
                                 .writer()
@@ -140,7 +136,7 @@ public class PutPetTests {
     @Test(description = "Метод PUT /pet должен вернуть статус код Not Found")
     public void putPetShouldReturnStatusCodeNotFoundTest() {
 
-        putPetRequest = new Pet();
+        Pet putPetRequest = new Pet();
         step("Изменение данных в модели Pet", () ->
                 putPetRequest
                         .id(16L)
@@ -149,7 +145,7 @@ public class PutPetTests {
                         .photoUrls(List.of("url1", "url2"))
                         .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
                         .status(Pet.StatusEnum.SOLD));
-        putJsonRequestBody =
+        String putJsonRequestBody =
                 step("Модель Pet в json", () ->
                         new ObjectMapper()
                                 .writer()
