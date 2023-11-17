@@ -170,11 +170,7 @@ public class PutPetTests {
     @Story("PUT /pet")
     @Test(description = "Метод PUT /pet должен вернуть статус код Bad Request")
     public void putPetShouldReturnStatusCodeBadRequestTest() {
-        String putJsonRequestBodyBadRequest = new ObjectMapper().toString();
-
-        uriPut =
-                step("Создание URI для запроса PUT /pet", () ->
-                        baseUri + "/pet");
+        String putJsonRequestBodyBadRequest = "";
 
         HttpClientErrorException exception =
                 step("Вызов запроса PUT /pet с другим id", () ->
