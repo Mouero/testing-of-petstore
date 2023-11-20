@@ -153,7 +153,7 @@ public class PutPetTests {
                                 .writeValueAsString(putPetRequest));
 
         HttpClientErrorException exception =
-                step("Вызов запроса PUT /pet с другим id", () ->
+                step("Вызов запроса PUT /pet с несуществующим id", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriPut, HttpMethod.PUT, new HttpEntity<>(putJsonRequestBody, headers), String.class))
@@ -169,7 +169,7 @@ public class PutPetTests {
         String putJsonRequestBodyBadRequest = "";
 
         HttpClientErrorException exception =
-                step("Вызов запроса PUT /pet с другим id", () ->
+                step("Вызов запроса PUT /pet без тела", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriPut, HttpMethod.PUT, new HttpEntity<>(putJsonRequestBodyBadRequest, headers), String.class))
