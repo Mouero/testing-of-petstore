@@ -44,28 +44,27 @@ public class GetPetFindByStatus {
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         });
 
-            petRequest = new Pet();
-            step("Заполнение модели Pet данными", () ->
-                    petRequest
-                            .id(16L)
-                            .name("Volt")
-                            .category(new Category().id(1L).name("Dogs"))
-                            .photoUrls(List.of("url1", "url2"))
-                            .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
-                            .status(Pet.StatusEnum.SOLD));
+        petRequest = new Pet();
+        step("Заполнение модели Pet данными", () ->
+                petRequest
+                        .id(16L)
+                        .name("Volt")
+                        .category(new Category().id(1L).name("Dogs"))
+                        .photoUrls(List.of("url1", "url2"))
+                        .tags(List.of(new Tag().id(0L).name("Crossbreed"), new Tag().id(1L).name("Boy")))
+                        .status(Pet.StatusEnum.SOLD));
 
-            jsonRequestBody = step("Модель Pet в json", () ->
-                    new ObjectMapper()
-                            .writer()
-                            .withDefaultPrettyPrinter()
-                            .writeValueAsString(petRequest));
-            uriPost =
-                    step("Создание URI для запроса Post/pet", () ->
-                            baseUri + "/pet");
+        jsonRequestBody = step("Модель Pet в json", () ->
+                new ObjectMapper()
+                        .writer()
+                        .withDefaultPrettyPrinter()
+                        .writeValueAsString(petRequest));
+        uriPost =
+                step("Создание URI для запроса Post/pet", () ->
+                        baseUri + "/pet");
 
-            step("Вызов Post запроса", () ->
-                    restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
-
+        step("Вызов Post запроса", () ->
+                restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
 
 
     }
@@ -82,15 +81,39 @@ public class GetPetFindByStatus {
                 step("Вызов запроса GET /pet/findByStatus для получения статусов созданных питомцев", () ->
                         restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet[].class).getBody());
 
-                Pet pet1 = Arrays.stream(getPetByPetId)
+        Pet gettingDesiredValueFromGet = Arrays.stream(getPetByPetId)
                 .filter(pet -> pet.getStatus().equals(Pet.StatusEnum.SOLD))
+                .filter(pet -> pet.getId().equals(16L))
                 .findFirst()
                 .get();
 
         SoftAssert softAssert = new SoftAssert();
         step("Сравнение ожидаемого и фактического результата", () -> {
-            step("Сравнение статуса первого полученного питомца из массива объектов и созданного питомца", () ->
-                    softAssert.assertEquals(pet1.getStatus(), petRequest.getStatus()));
+            step("Сравнение поля id первого полученного питомца из массива объектов и созданного питомца", () ->
+                    softAssert.assertEquals(gettingDesiredValueFromGet.getId(), petRequest.getId(),
+                            "Поле id не совпадает"));
+
+            step("Сравнение поля name первого полученного питомца из массива объектов и созданного питомца", () ->
+                    softAssert.assertEquals(gettingDesiredValueFromGet.getName(), petRequest.getName(),
+                            "Поле name не совпадает"));
+
+            step("Сравнение поля category первого полученного питомца из массива объектов и созданного питомца", () ->
+                    softAssert.assertEquals(gettingDesiredValueFromGet.getCategory(), petRequest.getCategory(),
+                            "Поле category не совпадает"));
+
+            step("Сравнение поля photoUrls первого полученного питомца из массива объектов и созданного питомца", () ->
+                    softAssert.assertEquals(gettingDesiredValueFromGet.getPhotoUrls(), petRequest.getPhotoUrls(),
+                            "Поле photoUrls не совпадает"));
+
+            step("Сравнение поля tags первого полученного питомца из массива объектов и созданного питомца", () ->
+                    softAssert.assertEquals(gettingDesiredValueFromGet.getTags(), petRequest.getTags(),
+                            "Поле tags не совпадает"));
+
+            step("Сравнение поля status первого полученного питомца из массива объектов и созданного питомца", () ->
+                    softAssert.assertEquals(gettingDesiredValueFromGet.getStatus(), petRequest.getStatus(),
+                            "Поле status не совпадает"));
+
+            softAssert.assertAll();
         });
 
     }
@@ -104,7 +127,7 @@ public class GetPetFindByStatus {
                         baseUri + "/pet/findByStatus?status=delivery");
 
         HttpClientErrorException exception =
-                step("Вызов запроса GET /pet/findByStatus без статуса", () ->
+                step("Вызов запроса GET /pet/findByStatus с невалидным статусом питомца", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody())
