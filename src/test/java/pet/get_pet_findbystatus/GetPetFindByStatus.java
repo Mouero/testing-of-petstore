@@ -71,13 +71,12 @@ public class GetPetFindByStatus {
     }
 
     @Story("GET /pet/findByStatus")
-    @Test(description = "Метод GET /pet/findByStatus должен вернуть статус код Ок")
-    public void getPetFindByStatusShouldReturnStatusCodeOkTest() {
+    @Test(description = "Метод GET /pet/findByStatus должен вернуть массив объектов Pet ")
+    public void getPetFindByStatusShouldReturnArrayOfPetObjectsTest() {
 
         uriGet =
                 step("Создание URI для запроса GET /pet/findByStatus", () ->
                         baseUri + "/pet/findByStatus?status=sold");
-
 
         Pet[] getPetByPetId =
                 step("Вызов запроса GET /pet/findByStatus для получения статусов созданных питомцев", () ->
@@ -90,7 +89,7 @@ public class GetPetFindByStatus {
 
         SoftAssert softAssert = new SoftAssert();
         step("Сравнение ожидаемого и фактического результата", () -> {
-            step("Сравнение статуса созданного и полученного питомца", () ->
+            step("Сравнение статуса первого полученного питомца из массива объектов и созданного питомца", () ->
                     softAssert.assertEquals(pet1.getStatus(), petRequest.getStatus()));
         });
 
@@ -101,8 +100,8 @@ public class GetPetFindByStatus {
     public void getPetFindByStatusShouldReturnStatusCodeBadRequestTest() {
 
         uriGet =
-                step("Создание URI для запроса GET /pet/findByStatus", () ->
-                        baseUri + "/pet/findByStatus");
+                step("Создание URI для запроса GET /pet/findByStatus с невалидным статусом питомца", () ->
+                        baseUri + "/pet/findByStatus?status=delivery");
 
         HttpClientErrorException exception =
                 step("Вызов запроса GET /pet/findByStatus без статуса", () ->
