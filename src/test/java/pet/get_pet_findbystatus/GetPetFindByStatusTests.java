@@ -19,7 +19,7 @@ import java.util.List;
 
 import static io.qameta.allure.Allure.step;
 
-public class GetPetFindByStatus {
+public class GetPetFindByStatusTests {
     private static String URL = "http://localhost:";
     private static int PORT = 8080;
     private static String BASE_PATH = "/api/v3";
@@ -60,10 +60,10 @@ public class GetPetFindByStatus {
                         .withDefaultPrettyPrinter()
                         .writeValueAsString(petRequest));
         uriPost =
-                step("Создание URI для запроса Post/pet", () ->
+                step("Создание URI для запроса POST/pet", () ->
                         baseUri + "/pet");
 
-        step("Вызов Post запроса", () ->
+        step("Вызов POST запроса", () ->
                 restTemplate.exchange(uriPost, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
 
 
