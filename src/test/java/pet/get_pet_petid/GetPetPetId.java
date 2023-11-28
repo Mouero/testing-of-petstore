@@ -73,8 +73,8 @@ public class GetPetPetId {
 
 
     @Story("GET /pet/{petId}")
-    @Test(description = "Метод GET /pet/{petId} должен вернуть статус код Ок")
-    public void getPetPetIdShouldReturnStatusCodeOkTest() {
+    @Test(description = "Метод GET /pet/{petId} должен вернуть модель Pet")
+    public void getPetPetIdShouldReturnPetTest() {
         uriGet =
                 step("Создание URI для запроса GET /pet/{petId}", () ->
                         baseUri + "/pet/15");
@@ -107,7 +107,7 @@ public class GetPetPetId {
                 step("Создание URI для запроса GET /pet/{petId}", () ->
                         baseUri + "/pet/16");
         HttpClientErrorException exception =
-                step("Вызов GET /pet/{petId} запроса с неверным id", () ->
+                step("Вызов GET /pet/{petId} запроса с несуществующим id", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody())
@@ -124,7 +124,7 @@ public class GetPetPetId {
                 step("Создание URI для запроса GET /pet/{petId}", () ->
                         baseUri + "/pet/string");
         HttpClientErrorException exception =
-                step("Вызов GET /pet/{petId} запроса со стринговым значением вместо id", () ->
+                step("Вызов GET /pet/{petId} запроса со строкой вместо id", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class,
                                 () -> restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody())
