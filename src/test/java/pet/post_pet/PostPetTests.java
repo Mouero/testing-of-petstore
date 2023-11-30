@@ -41,7 +41,7 @@ public class PostPetTests {
                 step("Создание базового URL", () ->
                         URL + PORT + BASE_PATH);
         uriPost =
-                step("Создание URI для запроса Post/pet", () ->
+                step("Создание URI для запроса POST /pet", () ->
                         baseUri + "/pet");
         headers = new HttpHeaders();
         step("Создание хедеров", () -> {
