@@ -30,6 +30,9 @@ public class PostPetPetIdTests {
     private String uriPostPet;
     private String uriPostPetPetId;
     private String uriGet;
+    private long ID = 19L;
+    private String changedName = "Jack";
+    private String changedStatus = "Pending";
 
     @SneakyThrows
     @BeforeMethod(alwaysRun = true)
@@ -47,7 +50,7 @@ public class PostPetPetIdTests {
         petRequest = new Pet();
         step("Заполнение модели Pet данными", () ->
                 petRequest
-                        .id(19L)
+                        .id(ID)
                         .name("Volt")
                         .category(new Category().id(1L).name("Dogs"))
                         .photoUrls(List.of("url1", "url2"))
@@ -71,18 +74,18 @@ public class PostPetPetIdTests {
     @Story("POST /pet/{petId}")
     @Test(description = "Метод POST /pet/{petId} должен изменить существующие поля name и status")
     public void postPetPetIdMustChangeExistingNameAndStatusTest() {
-        String petName = "Jack";
+        String petName = changedName;
         String petStatus = Pet.StatusEnum.PENDING.getValue();
 
         uriPostPetPetId =
                 step("Создание URI для запроса POST /pet/{petId}", () ->
-                        baseUri + "/pet/19?name=%s&status=%s".formatted(petName, petStatus));
+                        baseUri + "/pet/"+ ID +"?name=%s&status=%s".formatted(petName, petStatus));
         step("Вызов POST /pet/{petId} запроса", () ->
                 restTemplate.exchange(uriPostPetPetId, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
 
         uriGet =
                 step("Создание URI для запроса GET /pet/{petId}", () ->
-                        baseUri + "/pet/19");
+                        baseUri + "/pet/"+ ID);
         Pet getPetPetId =
                 step("Вызов GET /pet/{petId} запроса", () ->
                         restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody());
@@ -106,7 +109,7 @@ public class PostPetPetIdTests {
     public void postPetPetIdShouldReturnStatusCodeNotFoundTest() {
         uriPostPetPetId =
                 step("Создание URI для запроса POST /pet/{petId} с несуществующим id", () ->
-                        baseUri + "/pet/18?name=Jack&status=Pending");
+                        baseUri + "/pet/18?name="+ changedName + "&status=" + changedStatus);
 
         HttpClientErrorException exception =
                 step("Вызов запроса POST /pet/{petId} с несуществующим id", () ->
@@ -122,7 +125,7 @@ public class PostPetPetIdTests {
     public void postPetPetIdShouldReturnStatusCodeBadRequestTest() {
         uriPostPetPetId =
                 step("Создание URI для запроса POST /pet/{petId} без параметров", () ->
-                        baseUri + "/pet/19");
+                        baseUri + "/pet/" + ID);
 
         HttpClientErrorException exception =
                 step("Вызов запроса POST /pet/{petId} без параметров", () ->
