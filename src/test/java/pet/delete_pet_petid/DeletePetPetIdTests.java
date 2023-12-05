@@ -29,6 +29,7 @@ public class DeletePetPetIdTests {
     private String postPet;
     private String deleteUri;
     private String getUri;
+    private Long ID = 14L;
 
 
     @SneakyThrows
@@ -46,7 +47,7 @@ public class DeletePetPetIdTests {
         petRequest = new Pet();
         step("Заполнение модели Pet данными", () ->
                 petRequest
-                        .id(14L)
+                        .id(ID)
                         .name("Volt")
                         .category(new Category().id(1L).name("Dogs"))
                         .photoUrls(List.of("url1", "url2"))
@@ -71,13 +72,13 @@ public class DeletePetPetIdTests {
     public void deletePetPetIdMustDeleteCreatedPetByIdTest() {
         deleteUri =
                 step("Создание запроса DELETE /pet/{petId}", () ->
-                        baseUri + "/pet/14");
+                        baseUri + "/pet/" + ID);
         step("Вызов запроса DELETE /pet/{petId}", () ->
                 restTemplate.exchange(deleteUri, HttpMethod.DELETE, new HttpEntity<>(headers), String.class));
 
         getUri =
                 step("Создание запроса GET /pet/{petId}", () ->
-                        baseUri + "/pet/14");
+                        baseUri + "/pet/" + ID);
         HttpClientErrorException exception =
                 step("Вызов запроса GET /pet/{petId} по id удалённого питомца", () ->
                         Assert.expectThrows(
@@ -94,11 +95,11 @@ public class DeletePetPetIdTests {
     @Test(description = "Метод DELETE /pet/{petId} должен вернуть статус код Bad Request")
     public void deletePetPetIdShouldReturnStatusCodeBadRequestTest() {
         deleteUri =
-                step("Создание запроса DELETE /pet/{petId} со стракой в место id", () ->
+                step("Создание запроса DELETE /pet/{petId} со строкой", () ->
                         baseUri + "/pet/string");
 
         HttpClientErrorException exception =
-                step("Вызов запроса DELETE /pet/{petId} со стракой в место id", () ->
+                step("Вызов запроса DELETE /pet/{petId} со строкой в место id", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class, () ->
                                         restTemplate.exchange(deleteUri, HttpMethod.DELETE, new HttpEntity<>(headers), String.class)
