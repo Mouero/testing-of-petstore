@@ -107,5 +107,9 @@ public class DeletePetPetIdTests {
         step("Сравнение ожидаемого и фактического статус кода запроса DELETE /pet/{petId}", () ->
                 Assert.assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST));
 //Всего хорошего!
+
+        System.out.println(exception);
     }
+
+
 }
