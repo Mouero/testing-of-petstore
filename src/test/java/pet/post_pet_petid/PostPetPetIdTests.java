@@ -3,7 +3,11 @@ package pet.post_pet_petid;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.Story;
 import lombok.SneakyThrows;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.testng.Assert;
@@ -15,6 +19,7 @@ import petstore.model.Pet;
 import petstore.model.Tag;
 
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 import static io.qameta.allure.Allure.step;
 
@@ -30,9 +35,9 @@ public class PostPetPetIdTests {
     private String uriPostPet;
     private String uriPostPetPetId;
     private String uriGet;
-    private long ID = 19L;
-    private String changedName = "Jack";
-    private String changedStatus = "Pending";
+    private Long ID = 19L;
+    private String petName = "Jack";
+    private String petStatus = Pet.StatusEnum.PENDING.getValue();
 
     @SneakyThrows
     @BeforeMethod(alwaysRun = true)
@@ -74,18 +79,17 @@ public class PostPetPetIdTests {
     @Story("POST /pet/{petId}")
     @Test(description = "Метод POST /pet/{petId} должен изменить существующие поля name и status")
     public void postPetPetIdMustChangeExistingNameAndStatusTest() {
-        String petName = changedName;
-        String petStatus = Pet.StatusEnum.PENDING.getValue();
+
 
         uriPostPetPetId =
                 step("Создание URI для запроса POST /pet/{petId}", () ->
-                        baseUri + "/pet/"+ ID +"?name=%s&status=%s".formatted(petName, petStatus));
+                         "%s/pet/%d?name=%s&status=%s".formatted(baseUri, ID, petName, petStatus));
         step("Вызов POST /pet/{petId} запроса", () ->
                 restTemplate.exchange(uriPostPetPetId, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class));
 
         uriGet =
                 step("Создание URI для запроса GET /pet/{petId}", () ->
-                        baseUri + "/pet/"+ ID);
+                        "%s/pet/%d".formatted(baseUri, ID));
         Pet getPetPetId =
                 step("Вызов GET /pet/{petId} запроса", () ->
                         restTemplate.exchange(uriGet, HttpMethod.GET, new HttpEntity<>(headers), Pet.class).getBody());
@@ -109,14 +113,14 @@ public class PostPetPetIdTests {
     public void postPetPetIdShouldReturnStatusCodeNotFoundTest() {
         uriPostPetPetId =
                 step("Создание URI для запроса POST /pet/{petId} с несуществующим id", () ->
-                        baseUri + "/pet/18?name="+ changedName + "&status=" + changedStatus);
+                        "%s/pet/18?name=%s&status=%s".formatted(baseUri, petName, petStatus));
 
         HttpClientErrorException exception =
                 step("Вызов запроса POST /pet/{petId} с несуществующим id", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class, () ->
                 restTemplate.exchange(uriPostPetPetId, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class)));
-        step("Сравнение фактического и ожидаемого статус кода Post /pet/{petId} запроса", () ->
+        step("Сравнение фактического и ожидаемого статус кода POST /pet/{petId} запроса", () ->
                 Assert.assertEquals(exception.getStatusCode(), HttpStatus.NOT_FOUND));
     }
 
@@ -125,14 +129,14 @@ public class PostPetPetIdTests {
     public void postPetPetIdShouldReturnStatusCodeBadRequestTest() {
         uriPostPetPetId =
                 step("Создание URI для запроса POST /pet/{petId} без параметров", () ->
-                        baseUri + "/pet/" + ID);
+                        "%s/pet/%d".formatted(baseUri,ID));
 
         HttpClientErrorException exception =
                 step("Вызов запроса POST /pet/{petId} без параметров", () ->
                         Assert.expectThrows(
                                 HttpClientErrorException.class, () ->
                                         restTemplate.exchange(uriPostPetPetId, HttpMethod.POST, new HttpEntity<>(jsonRequestBody, headers), String.class)));
-        step("Сравнение фактического и ожидаемого статус кода Post /pet/{petId} запроса", () ->
+        step("Сравнение фактического и ожидаемого статус кода POST /pet/{petId} запроса", () ->
                 Assert.assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST));
     }
 
